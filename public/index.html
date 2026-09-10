@@ -4,6 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatApp</title>
+    <style>
+        body{
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        #messages{
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            background: rgb(201, 201, 201);
+            gap: 8px;
+            padding: 12px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+
+        }
+        #messages p {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin: 0;
+            word-wrap: break-word;
+        }
+        #messages p.mine {
+            align-self: flex-end;
+            background: #dcf8c6;
+        }
+        #messages p.theirs {
+            align-self: flex-start;
+            background: #e5e5ea;
+        }
+        #message {
+            padding: 8px;
+            width: 60%;
+        }
+        #sendBtn {
+            padding: 8px 16px;
+        }
+    </style>
 </head>
 <body>
     <h1>Chatting</h1>
@@ -19,15 +59,23 @@
         const messageInput = document.getElementById('message')
         const allMessages = document.getElementById('messages')
 
-        socket.on('message' , (message) => {
-            const p = document.createElement("p")
-            p.innerText = message;
+        function addMessage(text, isMine){
+            const p = document.createElement("p");
+            p.innerText = text;
+            p.classList.add(isMine ? "mine" : "theirs")
             allMessages.appendChild(p)
+        }
+
+        socket.on('message' , (message) => {
+            addMessage(message,false)
         })
 
         sendBtn.addEventListener("click" , (e)=>{
             const message = messageInput.value;
+            if(!message.trim()) return;
+            
             socket.emit('user-message', message);
+            addMessage(message,true)
 
             messageInput.value = "";
         })
